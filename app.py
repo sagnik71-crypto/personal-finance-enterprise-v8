@@ -142,7 +142,7 @@ def logout():
 @app.route('/api/transactions', methods=['GET', 'POST'])
 def manage_transactions():
     if 'user_email' not in session:
-        return jsonify({"status": "error", "message": "Unauthorized"}}, 401
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
         
     user_email = session['user_email']
     conn = sqlite3.connect(DB_NAME)
@@ -157,7 +157,7 @@ def manage_transactions():
         tx_date = body.get('date', datetime.now().strftime('%Y-%m-%d'))
         
         if not title or amount is None:
-            return jsonify({"status": "error", "message": "Missing fields"}}, 400
+            return jsonify({"status": "error", "message": "Missing fields"}), 400
             
         cursor.execute('''
             INSERT INTO transactions (user_email, title, amount, type, category, tx_date)
@@ -189,7 +189,7 @@ def support_ticket():
     recipient = ENTERPRISE_FINANCE_CONFIG["system_metadata"]["support_email"]
     
     if not message:
-        return jsonify({"status": "error", "message": "Missing information"}}, 400
+        return jsonify({"status": "error", "message": "Missing information"}), 400
         
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -202,7 +202,7 @@ def support_ticket():
 @app.route('/api/backup/export', methods=['GET'])
 def backup_export():
     if 'user_email' not in session:
-        return jsonify({"status": "error", "message": "Unauthorized"}}, 401
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
         
     user_email = session['user_email']
     conn = sqlite3.connect(DB_NAME)
