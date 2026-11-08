@@ -265,6 +265,17 @@ def backup_export():
     return send_file(path, as_attachment=True)
 
 
+@app.route('/robots.txt', methods=['GET'])
+def robots_txt():
+    robots_content = """User-agent: *
+Allow: /
+Sitemap: https://personal-finance-analyser-v8.onrender.com/sitemap.xml
+"""
+    response = make_response(robots_content)
+    response.headers["Content-Type"] = "text/plain"
+    return response
+
+
 @app.route('/sitemap.xml', methods=['GET'])
 def sitemap():
     base_url = "https://personal-finance-analyser-v8.onrender.com"
