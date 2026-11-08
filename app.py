@@ -10,6 +10,7 @@ from datetime import datetime
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Load local environment variables from .env
 load_dotenv()
@@ -20,6 +21,8 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 
 
 app = Flask(__name__)
+# Enforce correct proxy headers for HTTPS on Render
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.secret_key = os.urandom(24)
 DB_NAME = "finance_enterprise.db"
 
