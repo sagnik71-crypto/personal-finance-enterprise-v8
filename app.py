@@ -123,14 +123,23 @@ def login_google():
 
 @app.route('/authorize/google')
 def authorize_google():
-    token = google.authorize_access_token()
+    # Check if Google returned an error
+    if 'error' in request.args:
+        return redirect(url_for('index'))
+        
+    try:
+        token = google.authorize_access_token()
+    except Exception as e:
+        print(f"OAuth Error: {e}")
+        return redirect(url_for('index'))
+        
     user_info = token.get('userinfo')
     if user_info:
         email = user_info['email']
         name = user_info['name']
-        
         session['user_email'] = email
         session['user_name'] = name
+        	
         
         # Save or ignore user in SQLite database
         conn = sqlite3.connect(DB_NAME)
