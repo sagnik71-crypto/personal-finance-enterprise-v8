@@ -132,7 +132,7 @@ def authorize_google():
     try:
         token = google.authorize_access_token()
         # Parse the ID token correctly 
-        user_info = google.parse_id_token(token, none_sot=True)
+        user_info = google.parse_id_token(token)
     except Exception as e:
         print(f"OAuth Error: {e}")
         return f"OAuth Error: {str(e)}", 400
@@ -151,8 +151,8 @@ def authorize_google():
         conn.commit()
         conn.close()
         
-    return redirect('/dashboard')
-
+        return redirect('/dashboard')
+    return redirect(url_for('index'))
 
 @app.route('/dashboard')
 def dashboard():
