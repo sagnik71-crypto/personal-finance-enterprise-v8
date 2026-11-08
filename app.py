@@ -23,7 +23,7 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 app = Flask(__name__)
 # Enforce correct proxy headers for HTTPS on Render
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
-app.secret_key = os.urandom(24)
+app.secret_key = os.getenv("SECRET_KEY", "super-secret-static-key-change-this-later")
 DB_NAME = "finance_enterprise.db"
 
 # ==========================================
