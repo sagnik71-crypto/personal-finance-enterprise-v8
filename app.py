@@ -129,11 +129,12 @@ def authorize_google():
         
     try:
         token = google.authorize_access_token()
+        # Parse the ID token correctly 
+        user_info = google.parse_id_token(token, none_sot=True)
     except Exception as e:
         print(f"OAuth Error: {e}")
         return redirect(url_for('index'))
         
-    user_info = token.get('userinfo')
     if user_info:
         email = user_info['email']
         name = user_info['name']
@@ -148,7 +149,7 @@ def authorize_google():
         conn.commit()
         conn.close()
         
-    return redirect('/')
+    return redirect('/dashboard')
 
 @app.route('/api/user/session', methods=['GET'])
 def check_session():
