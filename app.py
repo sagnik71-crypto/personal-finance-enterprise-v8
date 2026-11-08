@@ -25,7 +25,9 @@ app = Flask(__name__)
 # Enforce correct proxy headers for HTTPS on Render
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY']=True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PREFERRED_URL_SCHEME'] ='https'
 app.secret_key = os.getenv("SECRET_KEY", "super-secret-static-key-change-this-later")
 DB_NAME = "finance_enterprise.db"
 
@@ -68,7 +70,7 @@ google = oauth.register(
     client_id=app.config['GOOGLE_CLIENT_ID'],
     client_secret=app.config['GOOGLE_CLIENT_SECRET'],
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={'scope': 'openid email profile'}
+    client_kwargs={'scope': 'openid email profile','state': False  # Disables strict session state checking across proxy redirects}
 )
 
 def init_db():
