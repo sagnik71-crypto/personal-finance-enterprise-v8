@@ -151,6 +151,14 @@ def authorize_google():
         
     return redirect('/dashboard')
 
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user_email' not in session:
+        return redirect(url_for('index'))
+    return render_template('dashboard.html')
+
+
 @app.route('/api/user/session', methods=['GET'])
 def check_session():
     if 'user_email' in session:
