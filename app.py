@@ -70,7 +70,10 @@ google = oauth.register(
     client_id=app.config['GOOGLE_CLIENT_ID'],
     client_secret=app.config['GOOGLE_CLIENT_SECRET'],
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={'scope': 'openid email profile','state': False  # Disables strict session state checking across proxy redirects}
+    client_kwargs={
+        'scope': 'openid email profile',
+        'state': False  # Disables strict session state checking across proxy redirects
+    }
 )
 
 def init_db():
