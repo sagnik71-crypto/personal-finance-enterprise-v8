@@ -157,10 +157,9 @@ def authorize_google():
 
 @app.route('/dashboard')
 def dashboard():
-    if 'user_email' not in session:
-        return redirect(url_for('index'))
-    return render_template('dashboard.html')
-
+    user_email = session.get('user_email')
+    user_name = session.get('user_name')
+    return render_template('dashboard.html', user_email=user_email, user_name=user_name)
 
 @app.route('/api/user/session', methods=['GET'])
 def check_session():
@@ -171,7 +170,7 @@ def check_session():
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
-    return jsonify({"status": "success"})
+    return redirect(url_for('dashboard'))
 
 # ==========================================
 # SECURE TRANSACTIONS & ENTERPRISE MODULES
