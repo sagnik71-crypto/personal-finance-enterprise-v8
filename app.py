@@ -132,7 +132,7 @@ def authorize_google():
     try:
         token = google.authorize_access_token()
         # Fetch user info directly from Google using the token
-        resp = google.get('userinfo')
+        resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo')
         user_info = resp.json()
     except Exception as e:
         print(f"OAuth Error: {e}")
