@@ -131,8 +131,9 @@ def authorize_google():
         
     try:
         token = google.authorize_access_token()
-        # Parse the ID token correctly 
-        user_info = google.parse_id_token(token)
+        # Fetch user info directly from Google using the token
+        resp = google.get('userinfo')
+        user_info = resp.json()
     except Exception as e:
         print(f"OAuth Error: {e}")
         return f"OAuth Error: {str(e)}", 400
