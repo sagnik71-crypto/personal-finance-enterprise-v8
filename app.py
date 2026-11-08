@@ -4,6 +4,7 @@ Author: Sagnik Guha
 """
 
 import os
+os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 import sqlite3
 import json
 from datetime import datetime
