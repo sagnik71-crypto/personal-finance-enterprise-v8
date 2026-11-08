@@ -797,8 +797,22 @@
                     })
                 });
                 const data = await response.json();
-                const adviceText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Unable to parse AI response. Please ensure your transactions are accurately logged.";
-                box.innerHTML = `<div class="font-bold text-purple-400 mb-1">CFO Audit Diagnostic:</div><div>${adviceText.replace(/\n/g, '<br>')}</div>`;
+                let adviceText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+                // Clean markdown code block fences if present
+                adviceText = adviceText.trim();
+                if (adviceText.startsWith("```")) {
+                    let parts = adviceText.split("```");
+                    if (parts.length > 1) {
+                        adviceText = parts[1];
+                        if (adviceText.startsWith("json")) {
+                            adviceText = adviceText.slice(4);
+                        }
+                    }
+                    adviceText = adviceText.trim();
+                }
+
+                box.innerHTML = `<div class="font-bold text-purple-400 mb-2">CFO Audit Diagnostic:</div><div class="text-gray-300 text-sm leading-relaxed">${adviceText}</div>`;
             } catch (err) {
                 console.error(err);
                 box.innerHTML = `<div class="text-rose-400">AI Advice Generation Error. Default Diagnostic: Keep spending under control and aim for a 30% monthly savings buffer.</div>`;
