@@ -264,5 +264,26 @@ def backup_export():
         
     return send_file(path, as_attachment=True)
 
+
+@app.route('/sitemap.xml', methods=['GET'])
+def sitemap():
+    base_url = "https://personal-finance-analyser-v8.onrender.com"
+    xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>{base_url}/</loc>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+</urlset>"""
+    response = make_response(xml_content)
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+
+
+
