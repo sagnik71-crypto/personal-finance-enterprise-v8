@@ -8,7 +8,7 @@ os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 import sqlite3
 import json
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file
+from flask import Flask, render_template, request, jsonify, make_response, session, redirect, url_for, send_file
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
 from werkzeug.middleware.proxy_fix import ProxyFix
