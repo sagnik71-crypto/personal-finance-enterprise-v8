@@ -1,32 +1,26 @@
-# 💰 Personal Finance Enterprise v8 (FinEnterprise V8)
+# Personal Finance Enterprise V8
 
-An enterprise-grade, secure full-stack personal finance and expense analysis dashboard built with Python, Flask, and SQLite, featuring Google OAuth 2.0 authentication and deployed on Render.
+A secure, full-stack personal finance manager and expense analyzer built with Flask, SQLite, Google OAuth 2.0, and Tailwind CSS. 
 
----
+## 🚀 Live Demo
+- **Live Application:** [https://personal-finance-analyser-v8.onrender.com](https://personal-finance-analyser-v8.onrender.com)
 
-## 🚀 Features
-
-* **🔐 Secure Authentication**: Integrated Google Identity Services (OAuth 2.0) with robust session security and proxy-fix middleware.
-* **📊 Interactive Dashboard**: Real-time financial overview, expense logging, and categorization powered by a clean, responsive frontend interface.
-* **🗄️ Robust Data Persistence**: Built-in SQLite database integration with parameterized queries ensuring data integrity and SQL injection defense.
-* **☁️ Cloud Ready**: Fully optimized for deployment on Render with automated proxy header handling and environment variable management.
-
----
+## ✨ Features
+- **Secure Authentication:** Real Google OAuth 2.0 integration for user sessions.
+- **Transaction Management:** Add, categorize, and track income and expenses seamlessly.
+- **Enterprise Security:** Built with parameterized queries, CSRF protections, and HTTPS proxy configuration.
+- **Data Portability:** Export your complete financial history and logs as JSON backups.
+- **SEO Optimized:** Dynamically generated `sitemap.xml`, `robots.txt`, and Open Graph meta tags for search engine discoverability.
 
 ## 🛠️ Tech Stack
+- **Backend:** Python, Flask, Authlib, SQLite
+- **Frontend:** Tailwind CSS, HTML5, JavaScript
+- **Deployment:** Render Cloud Infrastructure
 
-* **Backend**: Python, Flask, Authlib, Werkzeug (`ProxyFix`)
-* **Database**: SQLite3
-* **Frontend**: HTML5, CSS3, JavaScript, Tailwind CSS (Responsive Design)
-* **Hosting & Deployment**: Render Cloud Infrastructure
-
----
-
-## ⚙️ Local Development Setup
-
-Follow these steps to run the application locally on your machine or mobile environment (e.g., Termux):
+## 📦 Local Setup & Installation
 
 1. **Clone the repository:**
    ```bash
    git clone [https://github.com/sagnik71-crypto/Personal-finance-enterprise-v8.git](https://github.com/sagnik71-crypto/Personal-finance-enterprise-v8.git)
    cd Personal-finance-enterprise-v8
+
