@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PersonalFinanceEnterprise version="8.0" xmlns="https://personal-finance-analyser-v8.onrender.com/schema">
+  <Metadata>
+    <AppName>FinEnterprise V8</AppName>
+    <Author>Sagnik Guha</Author>
+    <Environment>Production</Environment>
+    <BaseURL>https://personal-finance-analyser-v8.onrender.com</BaseURL>
+  </Metadata>
+  <Configuration>
+    <Authentication>
+      <Provider>Google OAuth 2.0</Provider>
+      <SessionCookieSecure>true</SessionCookieSecure>
+      <SessionCookieSameSite>Lax</SessionCookieSameSite>
+      <StateValidation>false</StateValidation>
+    </Authentication>
+    <SEO>
+      <RobotsPath>/static/robots.txt</RobotsPath>
+      <SitemapPath>/sitemap.xml</SitemapPath>
+      <GoogleSearchConsoleVerified>true</GoogleSearchConsoleVerified>
+    </SEO>
+  </Configuration>
+  <Modules>
+    <Module name="UserManagement">
+      <Description>Handles user authentication and profile storage.</Description>
+      <Tables>
+        <Table name="users">
+          <Columns>
+            <Column primaryKey="true" type="INTEGER">id</Column>
+            <Column nullable="false" type="TEXT" unique="true">email</Column>
+            <Column nullable="false" type="TEXT">name</Column>
+            <Column default="CURRENT_TIMESTAMP" type="TIMESTAMP">created_at</Column>
+          </Columns>
+        </Table>
+      </Tables>
+    </Module>
+    <Module name="ExpenseAnalyzer">
+      <Description>Core engine for financial records, budgets, and categorization.</Description>
+      <Tables>
+        <Table name="transactions">
+          <Columns>
+            <Column primaryKey="true" type="INTEGER">id</Column>
+            <Column foreignKey="users.id" type="INTEGER">user_id</Column>
+            <Column nullable="false" type="REAL">amount</Column>
+            <Column nullable="false" type="TEXT">category</Column>
+            <Column type="TEXT">description</Column>
+            <Column nullable="false" type="DATE">transaction_date</Column>
+          </Columns>
+        </Table>
+      </Tables>
+    </Module>
+  </Modules>
+</PersonalFinanceEnterprise>
