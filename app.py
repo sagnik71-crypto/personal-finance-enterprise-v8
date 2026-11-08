@@ -23,6 +23,8 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 app = Flask(__name__)
 # Enforce correct proxy headers for HTTPS on Render
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.secret_key = os.getenv("SECRET_KEY", "super-secret-static-key-change-this-later")
 DB_NAME = "finance_enterprise.db"
 
@@ -133,7 +135,7 @@ def authorize_google():
         user_info = google.parse_id_token(token, none_sot=True)
     except Exception as e:
         print(f"OAuth Error: {e}")
-        return redirect(url_for('index'))
+        return f"OAuth Error: {str(e)}", 400
         
     if user_info:
         email = user_info['email']
