@@ -9,6 +9,15 @@ import json
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file
 from authlib.integrations.flask_client import OAuth
+from dotenv import load_dotenv
+
+# Load local environment variables from .env
+load_dotenv()
+
+# Securely fetch credentials for Authlib
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -43,11 +52,15 @@ ENTERPRISE_FINANCE_CONFIG = {
 }
 
 # Setup Authlib for Google OAuth with your credentials as fallbacks
+app.config["GOOGLE_CLIENT_ID"] = GOOGLE_CLIENT_ID
+app.config["GOOGLE_CLIENT_SECRET"] = GOOGLE_CLIENT_SECRET
+
+
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
-    client_id=os.environ.get('GOOGLE_CLIENT_ID'),
-    client_secret=os.environ.get('GOOGLE_CLIENT_SECRET'),
+    client_id=app.config['GOOGLE_CLIENT_ID'],
+    client_secret=app.config['GOOGLE_CLIENT_SECRET'],
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={'scope': 'openid email profile'}
 )
