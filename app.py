@@ -176,7 +176,7 @@ def check_session():
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('index'))
 
 # ==========================================
 # SECURE TRANSACTIONS & ENTERPRISE MODULES
