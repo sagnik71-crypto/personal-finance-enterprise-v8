@@ -134,32 +134,36 @@ def authorize_google():
     # Check if Google returned an error
     if 'error' in request.args:
         return redirect(url_for('index'))
-        
+
     try:
         token = google.authorize_access_token()
-        # Fetch user info directly from Google using the token
-        resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo')
+        resp = google.get('https://www.googleapis.com/oauth2/v2/userinfo')
         user_info = resp.json()
     except Exception as e:
         print(f"OAuth Error: {e}")
         return f"OAuth Error: {str(e)}", 400
-        
-    if user_info:
+
+    if user_info and 'email' in user_info:
         email = user_info['email']
-        name = user_info['name']
+        name = user_info.get('name', 'User')
+        
         session['user_email'] = email
         session['user_name'] = name
-        	
-        
+        session.permanent = True
+
         # Save or ignore user in SQLite database
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         cursor.execute('INSERT OR IGNORE INTO users (email, name) VALUES (?, ?)', (email, name))
         conn.commit()
         conn.close()
-        
+
+        # Force direct redirect to dashboard
         return redirect('/dashboard')
-    return redirect(url_for('index'))
+    
+    # Fallback error if email wasn't retrieved
+    return "Failed to retrieve user email from Google.", 400
+  
 
 @app.route('/dashboard')
 def dashboard():
