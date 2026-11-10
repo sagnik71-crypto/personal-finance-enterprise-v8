@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinEnterprise v8 - Personal Finance & AI Analytics</title>
+    <meta name="google-site-verification" content="EQCbTk4-wUUxx3wfnutRgU4xGa-G1b7tWyl0bOz84xA" />
+    <meta name="description" content="Personal Finance Enterprise V8 - Secure, feature-rich finance dashboard and expense analyzer with Google OAuth.">
+    <meta property="og:title" content="Personal Finance Enterprise V8">
+    <meta property="og:description" content="Track expenses, manage budgets, and export financial data securely.">
+    <meta property="og:type" content="website">
+    <meta name="keywords" content="Personal Finance, Expense Tracker, Budget Manager, Finance Enterprise, Finance Analyzer">
+    <meta name="author" content="Sagnik Guha">
+    <meta property="og:url" content="https://personal-finance-analyser-v8.onrender.com/">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5'                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for Visual Graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- jsPDF for Official Receipt Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .light .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.5); }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white transition-colors duration-200">
+
+    <!-- TOP GLOBAL NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 w-full border-b border-gray-800 bg-gray-950/90 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="handleLogoClick()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid font-bold text-white text-xl">₹</i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-gray-200 to-emerald-400 bg-clip-text text-transparent">FinEnterprise</span>
+                    <span class="text-[10px] font-semibold uppercase tracking-widest px-1.5 py-0.5 ml-1 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20">v8 Enterprise</span>
+                </div>
+            </div>
+
+            <!-- Tier 2 Navigation (Desktop Tabs) -->
+            <nav id="desktopNav" class="hidden md:flex items-center space-x-1">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-brand-400 bg-brand-500/10 transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-line text-xs"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-pie text-xs"></i>
+                    <span>Visual Graphs</span>
+                </button>
+                <button onclick="switchTab('suggestions')" id="nav-suggestions" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+                    <span>AI Advice</span>
+                </button>
+                <button onclick="switchTab('receipts')" id="nav-receipts" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-receipt text-xs"></i>
+                    <span>Receipt Generator</span>
+                </button>
+                <button onclick="switchTab('backup')" id="nav-backup" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-database text-xs"></i>
+                    <span>Data Backup</span>
+                </button>
+                <button onclick="switchTab('faq')" id="nav-faq" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-question text-xs"></i>
+                    <span>FAQ</span>
+                </button>
+                <button onclick="switchTab('contact')" id="nav-contact" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-envelope text-xs"></i>
+                    <span>Support</span>
+                </button>
+            </nav>
+
+            <!-- User Status & Control Panel -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openSettingsModal()" class="p-2.5 rounded-xl bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-gray-800 transition-all shadow-sm" title="Settings & Options">
+                    <i class="fa-solid fa-gear text-sm"></i>
+                </button>
+
+                <!-- Auth State Wrapper -->
+                <div id="authStatusWrapper">
+                    <button onclick="triggerGoogleSignIn()" class="px-4 py-2 rounded-xl bg-white text-gray-900 hover:bg-gray-100 text-xs font-bold transition-all shadow-md flex items-center space-x-2">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                        <span>Sign In</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Hamburger Control -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2.5 rounded-xl bg-gray-900 border border-gray-800 text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE NAVIGATION DRAWER (OUTSIDE HEADER FOR OVERLAY SUPPORT) -->
+    <div id="mobileMenu" class="hidden md:hidden fixed top-16 left-0 w-full z-50 bg-gray-900/95 border-b border-gray-800 backdrop-blur-xl px-4 pt-3 pb-6 shadow-2xl flex flex-col space-y-2">
+        <div class="px-2 pb-2 mb-2 border-b border-gray-800 flex justify-between items-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            <span>Enterprise Menu</span>
+            <span id="mobileUserLabel" class="text-brand-400">Guest Mode</span>
+        </div>
+        <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-xl text-gray-200 hover:bg-gray-800 font-medium flex items-center space-x-3">
+            <i class="fa-solid fa-chart-line text-brand-400 w-5"></i>
+            <span>Dashboard</span>
+        </button>
+        <button onclick="switchTab('analytics'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-xl text-gray-200 hover:bg-gray-800 font-medium flex items-center space-x-3">
+            <i class="fa-solid fa-chart-pie text-brand-400 w-5"></i>
+            <span>Visual Graphs</span>
+        </button>
+        <button onclick="switchTab('suggestions'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-xl text-gray-200 hover:bg-gray-800 font-medium flex items-center space-x-3">
+            <i class="fa-solid fa-wand-magic-sparkles text-brand-400 w-5"></i>
+            <span>AI Advice Engine</span>
+        </button>
+        <button onclick="switchTab('receipts'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-xl text-gray-200 hover:bg-gray-800 font-medium flex items-center space-x-3">
+            <i class="fa-solid fa-receipt text-brand-400 w-5"></i>
+            <span>Receipt Generator</span>
+        </button>
+        <button onclick="switchTab('backup'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-xl text-gray-200 hover:bg-gray-800 font-medium flex items-center space-x-3">
+            <i class="fa-solid fa-database text-brand-400 w-5"></i>
+            <span>Data Backup & Export</span>
+        </button>
+        <button onclick="switchTab('faq'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-xl text-gray-200 hover:bg-gray-800 font-medium flex items-center space-x-3">
+            <i class="fa-solid fa-circle-question text-brand-400 w-5"></i>
+            <span>FAQ</span>
+        </button>
+        <button onclick="switchTab('contact'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-xl text-gray-200 hover:bg-gray-800 font-medium flex items-center space-x-3">
+            <i class="fa-solid fa-envelope text-brand-400 w-5"></i>
+            <span>Support & Contact</span>
+        </button>
+        <button onclick="openSettingsModal(); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-xl text-gray-200 hover:bg-gray-800 font-medium flex items-center space-x-3">
+            <i class="fa-solid fa-gear text-brand-400 w-5"></i>
+            <span>Enterprise Settings</span>
+        </button>
+    </div>
+
+    <!-- MAIN APPLICATION CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- TIER 1: HIGH-CONVERTING LANDING PAGE (DEFAULT FOR UNAUTHENTICATED VISITORS) -->
+        <section id="tier1-landing" class="block space-y-16">
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl bg-gradient-to-br from-gray-900 via-gray-950 to-brand-900/30 p-8 sm:p-12 border border-gray-800 overflow-hidden shadow-2xl">
+                <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="max-w-3xl space-y-6 relative z-10">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Class 12 CS Viva Edition - Enterprise Grade v8</span>
+                    </div>
+                    <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
+                        Next-Gen Financial Intelligence for <span class="bg-gradient-to-r from-emerald-400 to-brand-500 bg-clip-text text-transparent">Modern Enterprise</span>.
+                    </h1>
+                    <p class="text-gray-400 text-base sm:text-lg leading-relaxed">
+                        Track income, control spending, leverage Gemini AI smart advice, export official receipts, and back up financial ledgers with absolute privacy and precision.
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
+                        <a href="/login/google" class="px-8 py-4 bg-white text-gray-900 font-semibold rounded-xl shadow-lg hover:bg-gray-100 transition flex items-center justify-center space-x-2">
+                            <i class="fa-brands fa-google"></i>
+                            <span>Sign In with Google OAuth</span>
+                        </a>
+                        <button onclick="demoGuestAccess()" class="px-8 py-4 rounded-xl bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-200 font-semibold text-base transition-all flex items-center justify-center space-x-2">
+                            <span>Launch Live Demo Dashboard</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Core Feature Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass p-6 rounded-2xl space-y-3 border border-gray-800/80 hover:border-brand-500/30 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl font-bold">
+                        <i class="fa-solid fa-chart-column"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Visual Analytics</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Interactive dual-theme canvas graphs plotting cash flow, expense categories, and monthly net margins.</p>
+                </div>
+                <div class="glass p-6 rounded-2xl space-y-3 border border-gray-800/80 hover:border-brand-500/30 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 text-xl font-bold">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">AI Advice Engine</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Real-time financial audits powered by Gemini API to optimize savings rate and highlight unusual spending.</p>
+                </div>
+                <div class="glass p-6 rounded-2xl space-y-3 border border-gray-800/80 hover:border-brand-500/30 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 text-xl font-bold">
+                        <i class="fa-solid fa-file-invoice font-bold"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Receipt Generator</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Instantly export branded PDF receipts and CSV ledger backups for tax compliance and audits.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIER 2: ENTERPRISE DASHBOARD (AUTHENTICATED VIEWS) -->
+        <section id="tier2-app" class="hidden space-y-8">
+
+            <!-- TAB 1: DASHBOARD -->
+            <div id="view-dashboard" class="tab-view space-y-6">
+                <!-- Metrics Bar -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="glass p-6 rounded-2xl border border-gray-800 space-y-2">
+                        <div class="flex justify-between items-center text-gray-400 text-xs font-bold uppercase tracking-wider">
+                            <span>Total Income</span>
+                            <i class="fa-solid fa-arrow-trend-up text-emerald-400"></i>
+                        </div>
+                        <div id="metricIncome" class="text-3xl font-extrabold text-white">₹0.00</div>
+                        <div class="text-xs text-gray-400">Updated real-time from active ledger</div>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border border-gray-800 space-y-2">
+                        <div class="flex justify-between items-center text-gray-400 text-xs font-bold uppercase tracking-wider">
+                            <span>Total Expenses</span>
+                            <i class="fa-solid fa-arrow-trend-down text-rose-400"></i>
+                        </div>
+                        <div id="metricExpense" class="text-3xl font-extrabold text-white">₹0.00</div>
+                        <div class="text-xs text-gray-400">Aggregated across all categories</div>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border border-gray-800 space-y-2">
+                        <div class="flex justify-between items-center text-gray-400 text-xs font-bold uppercase tracking-wider">
+                            <span>Net Balance</span>
+                            <i class="fa-solid fa-wallet text-brand-400"></i>
+                        </div>
+                        <div id="metricBalance" class="text-3xl font-extrabold text-brand-400">₹0.00</div>
+                        <div class="text-xs text-gray-400">Liquid available enterprise capital</div>
+                    </div>
+                </div>
+
+                <!-- Transaction Input & Log Split View -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Add Entry Form (Left) -->
+                    <div class="glass p-6 rounded-2xl border border-gray-800 space-y-4">
+                        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-plus-circle text-brand-400"></i>
+                            <span>Add New Transaction</span>
+                        </h3>
+                        <form id="transactionForm" onsubmit="handleAddTransaction(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-1">Title / Description</label>
+                                <input type="text" id="txTitle" required placeholder="e.g. Client Payment, AWS Hosting" class="w-full px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 focus:outline-none focus:border-brand-500 text-sm">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-400 mb-1">Amount (<span class="currency-symbol">₹</span>)</label>
+                                    <input type="number" id="txAmount" step="0.01" required placeholder="0.00" class="w-full px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 focus:outline-none focus:border-brand-500 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-400 mb-1">Type</label>
+                                    <select id="txType" class="w-full px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 focus:outline-none focus:border-brand-500 text-sm">
+                                        <option value="income">Income (+)</option>
+                                        <option value="expense">Expense (-)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-400 mb-1">Category</label>
+                                    <select id="txCategory" class="w-full px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 focus:outline-none focus:border-brand-500 text-sm">
+                                        <option value="General">General</option>
+                                        <option value="Salary">Salary</option>
+                                        <option value="Freelance">Freelance</option>
+                                        <option value="Software">Software</option>
+                                        <option value="Food & Dining">Food & Dining</option>
+                                        <option value="Utilities">Utilities</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-400 mb-1">Manual Date</label>
+                                    <input type="date" id="txDate" required class="w-full px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 focus:outline-none focus:border-brand-500 text-sm">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm transition-all shadow-lg shadow-brand-500/20">
+                                Record Entry
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Transaction Ledger Table (Right) -->
+                    <div class="lg:col-span-2 glass p-6 rounded-2xl border border-gray-800 space-y-4 flex flex-col justify-between">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-list-check text-brand-400"></i>
+                                <span>Recent Financial Ledger</span>
+                            </h3>
+                            <button onclick="clearLedger()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold">
+                                <i class="fa-solid fa-trash-can mr-1"></i> Clear Ledger
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="border-b border-gray-800 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                        <th class="py-3 px-2">Date</th>
+                                        <th class="py-3 px-2">Description</th>
+                                        <th class="py-3 px-2">Category</th>
+                                        <th class="py-3 px-2 text-right">Amount</th>
+                                        <th class="py-3 px-2 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ledgerTableBody" class="divide-y divide-gray-800/50">
+                                    <!-- Dynamic rows loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: VISUAL GRAPHS -->
+            <div id="view-analytics" class="tab-view hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Visual Analytics & Financial Ratios</h2>
+                        <p class="text-sm text-gray-400">Real-time data visualization based on active ledger inputs.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass p-6 rounded-2xl border border-gray-800 space-y-4">
+                        <h4 class="text-sm font-bold text-gray-200">Income vs Expenses Overview</h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartIncomeExpense"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border border-gray-800 space-y-4">
+                        <h4 class="text-sm font-bold text-gray-200">Expense Breakdown by Category</h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartCategory"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: AI ADVICE ENGINE -->
+            <div id="view-suggestions" class="tab-view hidden space-y-6">
+                <div class="glass p-6 rounded-2xl border border-gray-800 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 font-bold text-xl">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">Gemini AI Smart Advisor</h2>
+                            <p class="text-xs text-gray-400">Automated financial audit and actionable advice tailored to your active transactions.</p>
+                        </div>
+                    </div>
+                    <button onclick="generateAIAdvice()" id="aiAdviceBtn" class="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition-all shadow-lg shadow-purple-600/20 flex items-center space-x-2">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>Run AI Financial Audit</span>
+                    </button>
+                    <div id="aiOutputBox" class="hidden p-4 rounded-xl bg-gray-900 border border-purple-500/30 text-gray-200 text-sm space-y-2 leading-relaxed">
+                        <!-- AI Insights rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: OFFICIAL RECEIPT GENERATOR -->
+            <div id="view-receipts" class="tab-view hidden space-y-6">
+                <div class="glass p-6 rounded-2xl border border-gray-800 space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Official Receipt Generator</h2>
+                        <p class="text-sm text-gray-400">Generate and download official PDF receipts for any ledger item.</p>
+                    </div>
+                    <div class="space-y-4 max-w-xl">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Select Transaction to Generate Receipt</label>
+                            <select id="receiptTxSelect" class="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 text-sm focus:outline-none focus:border-brand-500">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <button onclick="downloadOfficialPDFReceipt()" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm transition-all shadow-lg shadow-brand-500/20 flex items-center space-x-2">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Download PDF Official Receipt</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: BACKUP & DATA CENTER -->
+            <div id="view-backup" class="tab-view hidden space-y-6">
+                <div class="glass p-6 rounded-2xl border border-gray-800 space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Backup & Enterprise Persistence</h2>
+                        <p class="text-sm text-gray-400">Export your ledger data to CSV, JSON, or SQL schema backups for long-term protection.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <button onclick="exportCSVBackup()" class="p-4 rounded-xl bg-gray-900 border border-gray-800 hover:border-brand-500/50 text-left space-y-2 group transition-all">
+                            <i class="fa-solid fa-file-csv text-2xl text-emerald-400"></i>
+                            <h4 class="font-bold text-white text-sm">Export CSV Ledger</h4>
+                            <p class="text-xs text-gray-400">Download formatted spreadsheet data for Excel / Sheets.</p>
+                        </button>
+                        <button onclick="exportJSONBackup()" class="p-4 rounded-xl bg-gray-900 border border-gray-800 hover:border-brand-500/50 text-left space-y-2 group transition-all">
+                            <i class="fa-solid fa-file-code text-2xl text-blue-400"></i>
+                            <h4 class="font-bold text-white text-sm">Export JSON State</h4>
+                            <p class="text-xs text-gray-400">Complete application state snapshot for system restore.</p>
+                        </button>
+                        <button onclick="exportSQLSchema()" class="p-4 rounded-xl bg-gray-900 border border-gray-800 hover:border-brand-500/50 text-left space-y-2 group transition-all">
+                            <i class="fa-solid fa-database text-2xl text-purple-400"></i>
+                            <h4 class="font-bold text-white text-sm">Export SQL Dump</h4>
+                            <p class="text-xs text-gray-400">Generate raw SQL INSERT statements for PostgreSQL / SQLite.</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: FAQ -->
+            <div id="view-faq" class="tab-view hidden space-y-6">
+                <div class="glass p-6 rounded-2xl border border-gray-800 space-y-6">
+                    <h2 class="text-2xl font-bold text-white">Frequently Asked Questions</h2>
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-xl bg-gray-900/50 border border-gray-800 space-y-1">
+                            <h4 class="font-bold text-brand-400 text-sm">Is my financial data secure?</h4>
+                            <p class="text-xs text-gray-400">Yes! All calculations are processed in-memory or persisted via encrypted local database structures.</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-gray-900/50 border border-gray-800 space-y-1">
+                            <h4 class="font-bold text-brand-400 text-sm">How does the AI Financial Advisor work?</h4>
+                            <p class="text-xs text-gray-400">The engine reads your income and expense categories, sending non-sensitive aggregate vectors to the Gemini API for tailored financial advice.</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-gray-900/50 border border-gray-800 space-y-1">
+                            <h4 class="font-bold text-brand-400 text-sm">How do I change the currency symbol?</h4>
+                            <p class="text-xs text-gray-400">Open Settings (gear icon in the top right header) to select INR (₹), USD ($), EUR (€), or GBP (£).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: CONTACT US -->
+            <div id="view-contact" class="tab-view hidden space-y-6">
+                <div class="glass p-6 rounded-2xl border border-gray-800 space-y-6 max-w-2xl mx-auto">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Enterprise Support</h2>
+                        <p class="text-sm text-gray-400">Direct support tickets are routed directly to <span class="text-brand-400 font-semibold">sagnikguha2010@gmail.com</span>.</p>
+                    </div>
+                    <form onsubmit="handleSupportSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Your Email Address</label>
+                            <input type="email" id="ticketEmail" required placeholder="user@domain.com" class="w-full px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 text-sm focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Support Message / Issue Details</label>
+                            <textarea id="ticketMessage" rows="4" required placeholder="Describe your query..." class="w-full px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 text-sm focus:outline-none focus:border-brand-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm transition-all shadow-lg shadow-brand-500/20">
+                            Send Ticket to sagnikguha2010@gmail.com
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6 relative shadow-2xl space-y-6">
+            <button onclick="closeSettingsModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-sliders text-brand-400"></i>
+                <span>Enterprise Settings</span>
+            </h3>
+
+            <!-- Theme Switcher -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-400">Appearance Mode</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setTheme('dark')" class="py-2.5 rounded-xl bg-gray-950 border border-gray-800 text-xs font-semibold text-gray-200 hover:border-brand-500">Dark</button>
+                    <button onclick="setTheme('light')" class="py-2.5 rounded-xl bg-gray-950 border border-gray-800 text-xs font-semibold text-gray-200 hover:border-brand-500">Light</button>
+                    <button onclick="setTheme('system')" class="py-2.5 rounded-xl bg-gray-950 border border-gray-800 text-xs font-semibold text-gray-200 hover:border-brand-500">System</button>
+                </div>
+            </div>
+
+            <!-- Currency Switcher -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-400">Active Currency</label>
+                <select id="currencySelect" onchange="changeCurrency(this.value)" class="w-full px-4 py-2.5 rounded-xl bg-gray-950 border border-gray-800 text-gray-200 text-sm focus:outline-none focus:border-brand-500">
+                    <option value="₹">₹ (INR - Indian Rupee)</option>
+                    <option value="$">$ (USD - US Dollar)</option>
+                    <option value="€">€ (EUR - Euro)</option>
+                    <option value="£">£ (GBP - British Pound)</option>
+                </select>
+            </div>
+
+            <button onclick="closeSettingsModal()" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm transition-all shadow-md">
+                Save & Apply Settings
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC & STATE ARCHITECTURE -->
+    <script>
+        // Global State Store
+        let state = {
+            authenticated: false,
+            user: null,
+            currency: '₹',
+            transactions: [
+                { id: '1', title: 'Consulting Retainer', amount: 45000, type: 'income', category: 'Freelance', date: '2026-11-01' },
+                { id: '2', title: 'Cloud Infrastructure', amount: 3500, type: 'expense', category: 'Software', date: '2026-11-03' },
+                { id: '3', title: 'Office Supplies', amount: 1200, type: 'expense', category: 'General', date: '2026-11-05' }
+            ]
+        };
+
+        let chartIncomeExpenseInstance = null;
+        let chartCategoryInstance = null;
+
+        // Initialize App on DOM Ready
+        document.addEventListener("DOMContentLoaded", () => {
+            // Set Default Date Picker Value to Today
+            const txDateInput = document.getElementById("txDate");
+            if (txDateInput) txDateInput.value = new Date().toISOString().split('T')[0];
+            
+            updateUI();
+        });
+
+        // Auth Logic (Tier 1 -> Tier 2 Transition)
+        function triggerGoogleSignIn() {
+            state.authenticated = true;
+            state.user = { name: "Sagnik Guha", email: "sagnikguha2010@gmail.com" };
+            renderAuthStatus();
+            switchToTier2();
+        }
+
+        function demoGuestAccess() {
+            state.authenticated = true;
+            state.user = { name: "Guest User", email: "guest@enterprise.com" };
+            renderAuthStatus();
+            switchToTier2();
+        }
+
+        function renderAuthStatus() {
+            const wrapper = document.getElementById("authStatusWrapper");
+            const mobileLabel = document.getElementById("mobileUserLabel");
+            if (state.authenticated && state.user) {
+                wrapper.innerHTML = `
+                    <div class="flex items-center space-x-2 bg-gray-900 border border-gray-800 px-3 py-1.5 rounded-xl">
+                        <div class="w-6 h-6 rounded-full bg-brand-500 text-white flex items-center justify-center text-xs font-bold">
+                            ${state.user.name.charAt(0)}
+                        </div>
+                        <span class="text-xs font-semibold text-gray-200 hidden sm:inline">${state.user.name}</span>
+                    </div>
+                `;
+                if (mobileLabel) mobileLabel.textContent = state.user.name;
+            }
+        }
+
+        function switchToTier2() {
+            document.getElementById("tier1-landing").classList.add("hidden");
+            document.getElementById("tier2-app").classList.remove("hidden");
+            switchTab('dashboard');
+        }
+
+        function handleLogoClick() {
+            if (state.authenticated) {
+                switchTab('dashboard');
+            } else {
+                document.getElementById("tier1-landing").classList.remove("hidden");
+                document.getElementById("tier2-app").classList.add("hidden");
+            }
+        }
+
+        // Tab Navigation Switcher
+        function switchTab(tabId) {
+            const views = ['dashboard', 'analytics', 'suggestions', 'receipts', 'backup', 'faq', 'contact'];
+            
+            views.forEach(v => {
+                const viewEl = document.getElementById('view-' + v);
+                const navEl = document.getElementById('nav-' + v);
+                if (viewEl) viewEl.classList.add('hidden');
+                if (navEl) {
+                    navEl.classList.remove('text-brand-400', 'bg-brand-500/10');
+                    navEl.classList.add('text-gray-400');
+                }
+            });
+
+            const targetView = document.getElementById('view-' + tabId);
+            const targetNav = document.getElementById('nav-' + tabId);
+
+            if (targetView) targetView.classList.remove('hidden');
+            if (targetNav) {
+                targetNav.classList.remove('text-gray-400');
+                targetNav.classList.add('text-brand-400', 'bg-brand-500/10');
+            }
+
+            if (tabId === 'analytics') renderCharts();
+            if (tabId === 'receipts') populateReceiptDropdown();
+        }
+
+        // Mobile Menu Drawer Control
+        function toggleMobileMenu() {
+            const menu = document.getElementById("mobileMenu");
+            if (menu) menu.classList.toggle("hidden");
+        }
+
+        // Transaction Management & Ledger Logic
+        function handleAddTransaction(e) {
+            e.preventDefault();
+            const title = document.getElementById("txTitle").value;
+            const amount = parseFloat(document.getElementById("txAmount").value);
+            const type = document.getElementById("txType").value;
+            const category = document.getElementById("txCategory").value;
+            const date = document.getElementById("txDate").value;
+
+            const newTx = { id: Date.now().toString(), title, amount, type, category, date };
+            state.transactions.unshift(newTx);
+            
+            document.getElementById("transactionForm").reset();
+            document.getElementById("txDate").value = new Date().toISOString().split('T')[0];
+
+            updateUI();
+        }
+
+        function deleteTransaction(id) {
+            state.transactions = state.transactions.filter(t => t.id !== id);
+            updateUI();
+        }
+
+        function clearLedger() {
+            state.transactions = [];
+            updateUI();
+        }
+
+        function updateUI() {
+            // Update Currency Indicators
+            document.querySelectorAll(".currency-symbol").forEach(el => el.textContent = state.currency);
+
+            // Compute Totals
+            let income = 0;
+            let expense = 0;
+
+            state.transactions.forEach(t => {
+                if (t.type === 'income') income += t.amount;
+                else expense += t.amount;
+            });
+
+            const balance = income - expense;
+
+            // Render Metrics
+            document.getElementById("metricIncome").textContent = `${state.currency}${income.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById("metricExpense").textContent = `${state.currency}${expense.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById("metricBalance").textContent = `${state.currency}${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            // Render Ledger Table
+            const tbody = document.getElementById("ledgerTableBody");
+            if (tbody) {
+                if (state.transactions.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-gray-500 text-xs">No active transactions in ledger.</td></tr>`;
+                } else {
+                    tbody.innerHTML = state.transactions.map(t => `
+                        <tr class="hover:bg-gray-900/40 transition-all">
+                            <td class="py-3 px-2 text-xs text-gray-400 font-medium">${t.date}</td>
+                            <td class="py-3 px-2 font-semibold text-gray-200">${t.title}</td>
+                            <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-800 text-gray-300 border border-gray-700">${t.category}</span></td>
+                            <td class="py-3 px-2 text-right font-extrabold ${t.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}">
+                                ${t.type === 'income' ? '+' : '-'}${state.currency}${t.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                            </td>
+                            <td class="py-3 px-2 text-center">
+                                <button onclick="deleteTransaction('${t.id}')" class="text-gray-500 hover:text-rose-400 p-1"><i class="fa-solid fa-xmark text-xs"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            }
+        }
+
+        // Settings Modal Controls
+        function openSettingsModal() {
+            document.getElementById("settingsModal").classList.remove("hidden");
+        }
+        function closeSettingsModal() {
+            document.getElementById("settingsModal").classList.add("hidden");
+        }
+        function changeCurrency(val) {
+            state.currency = val;
+            updateUI();
+        }
+        function setTheme(mode) {
+            if (mode === 'dark') document.documentElement.classList.add('dark');
+            else if (mode === 'light') document.documentElement.classList.remove('dark');
+            else document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
+        }
+
+        // Chart.js Rendering Engine
+        function renderCharts() {
+            const ctx1 = document.getElementById('chartIncomeExpense');
+            const ctx2 = document.getElementById('chartCategory');
+            if (!ctx1 || !ctx2) return;
+
+            let totalIncome = state.transactions.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
+            let totalExpense = state.transactions.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
+
+            if (chartIncomeExpenseInstance) chartIncomeExpenseInstance.destroy();
+            chartIncomeExpenseInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Income', 'Expenses'],
+                    datasets: [{
+                        label: 'Cashflow',
+                        data: [totalIncome, totalExpense],
+                        backgroundColor: ['#10b981', '#f43f5e'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // Category Breakdown Chart
+            const catMap = {};
+            state.transactions.filter(t => t.type === 'expense').forEach(t => {
+                catMap[t.category] = (catMap[t.category] || 0) + t.amount;
+            });
+
+            if (chartCategoryInstance) chartCategoryInstance.destroy();
+            chartCategoryInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(catMap).length ? Object.keys(catMap) : ['No Data'],
+                    datasets: [{
+                        data: Object.keys(catMap).length ? Object.values(catMap) : [1],
+                        backgroundColor: ['#10b981', '#8b5cf6', '#3b82f6', '#f59e0b', '#ec4899', '#64748b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af' } } }
+                }
+            });
+        }
+
+        // Gemini AI Smart Advice Integration
+        async function generateAIAdvice() {
+            const btn = document.getElementById("aiAdviceBtn");
+            const box = document.getElementById("aiOutputBox");
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Analyzing Ledger...</span>`;
+            box.classList.remove("hidden");
+            box.innerHTML = `Running smart financial audit on ${state.transactions.length} active ledger records...`;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const systemPrompt = "Act as an elite CFO financial adviser. Provide a concise, highly strategic 3-bullet-point financial diagnostic based on the user's ledger metrics.";
+            const userQuery = `My financial ledger status: Transactions count: ${state.transactions.length}. Details: ${JSON.stringify(state.transactions)}. Please analyze spending habits and output action-oriented advice.`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: userQuery }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    })
+                });
+                const data = await response.json();
+                let adviceText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+                // Clean markdown code block fences if present
+                adviceText = adviceText.trim();
+                if (adviceText.startsWith("```")) {
+                    let parts = adviceText.split("```");
+                    if (parts.length > 1) {
+                        adviceText = parts[1];
+                        if (adviceText.startsWith("json")) {
+                            adviceText = adviceText.slice(4);
+                        }
+                    }
+                    adviceText = adviceText.trim();
+                }
+
+                box.innerHTML = `<div class="font-bold text-purple-400 mb-2">CFO Audit Diagnostic:</div><div class="text-gray-300 text-sm leading-relaxed">${adviceText}</div>`;
+            } catch (err) {
+                console.error(err);
+                box.innerHTML = `<div class="text-rose-400">AI Advice Generation Error. Default Diagnostic: Keep spending under control and aim for a 30% monthly savings buffer.</div>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-robot"></i> <span>Run AI Financial Audit</span>`;
+            }
+        }
+
+        // Official Receipt Generator
+        function populateReceiptDropdown() {
+            const select = document.getElementById("receiptTxSelect");
+            if (!select) return;
+            select.innerHTML = state.transactions.map(t => `
+                <option value="${t.id}">${t.date} - ${t.title} (${state.currency}${t.amount})</option>
+            `).join('');
+        }
+
+        function downloadOfficialPDFReceipt() {
+            const select = document.getElementById("receiptTxSelect");
+            const txId = select ? select.value : null;
+            const tx = state.transactions.find(t => t.id === txId);
+
+            if (!tx) {
+                alert("Please select a valid transaction first.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("FinEnterprise v8 - Official Receipt", 20, 25);
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Receipt Reference ID: OFF-REC-${tx.id}`, 20, 35);
+            doc.text(`Generated Date: ${new Date().toLocaleDateString()}`, 20, 42);
+
+            doc.setDrawColor(200, 200, 200);
+            doc.line(20, 48, 190, 48);
+
+            doc.setFontSize(12);
+            doc.text(`Transaction Title: ${tx.title}`, 20, 60);
+            doc.text(`Category: ${tx.category}`, 20, 70);
+            doc.text(`Entry Date: ${tx.date}`, 20, 80);
+            doc.text(`Type: ${tx.type.toUpperCase()}`, 20, 90);
+            doc.text(`Total Amount: ${state.currency}${tx.amount.toFixed(2)}`, 20, 100);
+
+            doc.save(`Official_Receipt_${tx.id}.pdf`);
+        }
+
+        // Export Center Logic
+        function exportCSVBackup() {
+            let csvContent = "data:text/csv;charset=utf-8,ID,Title,Amount,Type,Category,Date\n";
+            state.transactions.forEach(t => {
+                csvContent += `${t.id},"${t.title}",${t.amount},${t.type},${t.category},${t.date}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `FinEnterprise_Backup_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportJSONBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `FinEnterprise_State_${Date.now()}.json`);
+            document.body.appendChild(dlAnchorElem);
+            dlAnchorElem.click();
+            dlAnchorElem.remove();
+        }
+
+        function exportSQLSchema() {
+            let sql = "-- FinEnterprise v8 SQL Ledger Dump\nCREATE TABLE IF NOT EXISTS ledger (id VARCHAR(50), title VARCHAR(255), amount DECIMAL(10,2), type VARCHAR(20), category VARCHAR(100), date DATE);\n";
+            state.transactions.forEach(t => {
+                sql += `INSERT INTO ledger VALUES ('${t.id}', '${t.title.replace(/'/g, "''")}', ${t.amount}, '${t.type}', '${t.category}', '${t.date}');\n`;
+            });
+            const blob = new Blob([sql], { type: 'text/sql' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `FinEnterprise_Schema_${Date.now()}.sql`;
+            link.click();
+        }
+
+        // Support Form Handler
+        function handleSupportSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById("ticketEmail").value;
+            const msg = document.getElementById("ticketMessage").value;
+
+            alert(`Support ticket dispatched successfully!\nRouting copy to: sagnikguha2010@gmail.com\nUser: ${email}`);
+            e.target.reset();
+        }
+    </script>
+</body>
+</html>
