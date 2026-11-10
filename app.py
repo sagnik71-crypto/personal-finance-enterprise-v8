@@ -165,7 +165,7 @@ def authorize_google():
 def dashboard():
     user_email = session.get('user_email')
     user_name = session.get('user_name')
-    return render_template('index.html', user_email=user_email, user_name=user_name)
+    return render_template('dashboard.html', user_email=user_email, user_name=user_name)
 
 @app.route('/api/user/session', methods=['GET'])
 def check_session():
