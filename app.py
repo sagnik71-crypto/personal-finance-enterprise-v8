@@ -26,7 +26,7 @@ app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY']=True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SAMESITE'] = 'NONE'
 app.config['PREFERRED_URL_SCHEME'] ='https'
 app.secret_key = os.getenv("SECRET_KEY", "super-secret-static-key-change-this-later")
 DB_NAME = "finance_enterprise.db"
