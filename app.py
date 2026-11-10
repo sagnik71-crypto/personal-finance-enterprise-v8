@@ -169,12 +169,15 @@ def authorize_google():
 def dashboard():
     user_email = session.get('user_email')
     user_name = session.get('user_name')
+    if not user_email:
+        return redirect(url_for('index'))
     return render_template('dashboard.html', user_email=user_email, user_name=user_name)
 
 @app.route('/api/user/session', methods=['GET'])
 def check_session():
     if 'user_email' in session:
         return jsonify({"authenticated": True, "email": session['user_email'], "name": session['user_name']})
+    
     return jsonify({"authenticated": False})
 
 @app.route('/logout', methods=['POST'])
