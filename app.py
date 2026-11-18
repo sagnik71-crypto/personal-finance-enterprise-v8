@@ -173,6 +173,49 @@ def dashboard():
         return redirect(url_for('index'))
     return render_template('dashboard.html', user_email=user_email, user_name=user_name)
 
+@app.route('/api/audit', methods=['GET', 'POST'])
+def run_ai_audit():
+    user_email = session.get('user_email')
+    if not user_email:
+        return jsonify({"report": "Error: User not authenticated."}), 401
+
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM transactions WHERE user_email = ?", (user_email,))
+        rows = cursor.fetchall()
+        transactions = [dict(row) for row in rows]
+        conn.close()
+    except Exception as e:
+        transactions = []
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return jsonify({"report": "Error: GEMINI_API_KEY environment variable is missing."}), 500
+
+    try:
+        from google import genai
+        client = genai.Client(api_key=api_key)
+        
+        prompt = (
+            f"Perform a professional CFO financial audit and diagnostic based on these user transactions: {transactions}. "
+            "Provide concise, actionable advice and spending analysis."
+        )
+        
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        report_text = response.text
+    except Exception as e:
+        report_text = f"Failed to generate audit report: {str(e)}"
+
+    return jsonify({"report": report_text})
+
+
+
+
 @app.route('/api/user/session', methods=['GET'])
 def check_session():
     if 'user_email' in session:
