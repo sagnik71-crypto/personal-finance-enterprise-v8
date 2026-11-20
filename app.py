@@ -12,6 +12,8 @@ from flask import Flask, render_template, request, jsonify, make_response, sessi
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
 from werkzeug.middleware.proxy_fix import ProxyFix
+import time
+from google.genai.errors import APIError
 
 # Load local environment variables from .env
 load_dotenv()
@@ -202,17 +204,33 @@ def run_ai_audit():
             f"Perform a professional CFO financial audit and diagnostic based on these user transactions: {transactions}. "
             "Provide concise, actionable advice and spending analysis."
         )
-        
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-        )
-        report_text = response.text
+        last_error = None
+        report_text = ""
+        for attempt in range(3):
+            try:
+                 response = client.models.generate_content(
+                     model="gemini-3.8-flash",
+                     contents=prompt,
+                 )
+                 report_text = response.text
+                 last_error = None
+                 break
+            except APIError as e:
+                 last_error = e
+                 if gettattr(e, "code", None) in (429, 503) and attempt < 2:
+                     time.sleep(2 * (attempt + 1))
+                     continue
+                 break
+            except Exception as e:
+                 last_error = e
+                 break
+        if last_error is not None:
+            report_text = f"Failed to generate audit report: {last_error}"
+       
+
+        return jsonify({"report": report_text})
     except Exception as e:
-        report_text = f"Failed to generate audit report: {str(e)}"
-
-    return jsonify({"report": report_text})
-
+        return jsonify({"report": f"Failed to generate audit report: {e}"}) 
 
 
 
