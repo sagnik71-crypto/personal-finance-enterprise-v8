@@ -217,8 +217,8 @@ def run_ai_audit():
                  break
             except APIError as e:
                  last_error = e
-                 err_code =  gettattr(e, "code", None)
-                 if (err_code in (429, 503) or "503" in str(e) or "429" in str(e)) and attempt < 2:
+                 err_code = str(e)
+                 if ("429" in err_str or "503" in err_str) and attempt < 2:
                      time.sleep(2 * (attempt + 1))
                      continue
                  break
