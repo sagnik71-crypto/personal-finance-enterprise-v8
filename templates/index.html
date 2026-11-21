@@ -59,6 +59,8 @@
         ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.5); }
     </style>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white transition-colors duration-200">
 
@@ -78,6 +80,7 @@
 
             <!-- Tier 2 Navigation (Desktop Tabs) -->
             <nav id="desktopNav" class="hidden md:flex items-center space-x-1">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="FinEnterprise V8 Logo" class="w-8 h-8 rounded-lg object-cover">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-brand-400 bg-brand-500/10 transition-all flex items-center space-x-2">
                     <i class="fa-solid fa-chart-line text-xs"></i>
                     <span>Dashboard</span>
